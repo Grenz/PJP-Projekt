@@ -7,3 +7,5 @@
 #include <stdio.h>
 #include <stdlib.h>
 void generowanie_tablicy(int tab[8][8]);
+void elementtablicy(int posofmouseX, int posofmouseY, int* X, int *Y);
+void sprawdzanie_tablicy(int tab[8][8]);

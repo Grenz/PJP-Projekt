@@ -21,6 +21,12 @@
     <ClCompile Include="generowanie tablicy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="elementtablicy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sprawdzanie tablicy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Header.h">
