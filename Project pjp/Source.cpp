@@ -3,6 +3,7 @@ int main(void)
 {
 	/* Zmienne Z Gry*/
 	int tab[8][8];
+	int wiersz = 6;
 	int menu = 2;
 	kamienie kamienietab[8][8];
 	int czasgry = 0;
@@ -11,6 +12,7 @@ int main(void)
 	int plansza_x = 0;
 	int plansza_y = 150;
 	int score = 0;
+	bool przesuwaniee = false;
 	bool done = false;
 	bool mousemovment = false;
 	bool plansza = true;
@@ -36,6 +38,9 @@ int main(void)
 	ALLEGRO_BITMAP *ranking = NULL;
 	ALLEGRO_BITMAP *rankingbutton = NULL;
 	ALLEGRO_DISPLAY_MODE   disp_data;
+	ALLEGRO_SAMPLE *song=NULL;
+	ALLEGRO_SAMPLE *dzwiekprzesuwania = NULL;
+	ALLEGRO_SAMPLE_INSTANCE  *SoundIstance = NULL;
 
 
 	srand(time(NULL));
@@ -56,6 +61,8 @@ int main(void)
 	al_install_mouse();
 	al_init_font_addon();
 	al_init_ttf_addon();
+	al_install_audio();
+	al_init_acodec_addon();
 
 	ALLEGRO_FONT *font24 = al_load_font("fontscore.ttf", 48, 0);
 
@@ -86,11 +93,19 @@ int main(void)
 	al_convert_mask_to_alpha(button, al_map_rgb(250, 10, 220));
 	al_convert_mask_to_alpha(ranking, al_map_rgb(250, 10, 230));
 	al_convert_mask_to_alpha(rankingbutton, al_map_rgb(250, 10, 220));
+	
+	al_reserve_samples(50);
+	song = al_load_sample("song.ogg");
+	dzwiekprzesuwania = al_load_sample("getruby.flac");
 
+	SoundIstance = al_create_sample_instance(song);
+	al_set_sample_instance_playmode(SoundIstance, ALLEGRO_PLAYMODE_LOOP);
+	al_attach_sample_instance_to_mixer(SoundIstance, al_get_default_mixer());
 
 	al_start_timer(timer);
 	while (!done)
 	{
+		al_play_sample_instance(SoundIstance);
 		ALLEGRO_EVENT event;
 		al_wait_for_event(queue, &event);
 		if (menu == 1) //Gra
@@ -119,6 +134,7 @@ int main(void)
 
 						mousemovment = true;
 						sprawdzanieplanszy = false;
+						przesuwaniee = false;
 					}
 				}
 				if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP)
@@ -129,6 +145,7 @@ int main(void)
 						y2 = 10;
 						mousemovment = false;
 						sprawdzanieplanszy = true;
+						przesuwaniee = false;
 					}
 				}
 				if (event.type == ALLEGRO_EVENT_KEY_DOWN)
@@ -144,10 +161,14 @@ int main(void)
 			if (redraw == true)
 			{
 				czasgry++;
-				if (sprawdzanieplanszy == true)
+				if (sprawdzanieplanszy == true&&przesuwaniee==false)
 				{
 					if (czasgry % 60 == 0)
-						sprawdzanie_tablicy(kamienietab, &score, &sprawdzanieplanszy);
+						sprawdzanie_tablicy(kamienietab, &score, &sprawdzanieplanszy,&przesuwaniee);
+				}
+				else if (sprawdzanieplanszy==false&&przesuwaniee==true)
+				{
+					przesuwanie(kamienietab, &sprawdzanieplanszy, &przesuwaniee, &wiersz);
 				}
 				redraw = false;
 				al_draw_bitmap(background, 0, 0, NULL);
@@ -175,10 +196,10 @@ int main(void)
 					// ZAMIANA WARTOSCI KLOCKOW
 					if ((!(x1 == x2) && !(x2 == 10) && !(y2 == 10)) || (!(y1 == y2) && !(x2 == 10) && !(y2 == 10)))
 					{
+						al_play_sample(dzwiekprzesuwania,0.5,0,1,ALLEGRO_PLAYMODE_ONCE,0);
 						TabB = kamienietab[x2][y2].wartosc;
 						wspolrzedneTabB_x = kamienietab[x2][y2].bitmapax;
 						wspolrzedneTabB_y = kamienietab[x2][y2].bitmapay;
-
 						TabA = kamienietab[x1][y1].wartosc;
 						wspolrzedneTabA_x = kamienietab[x1][y1].bitmapax;
 						wspolrzedneTabA_y = kamienietab[x1][y1].bitmapay;
@@ -201,6 +222,7 @@ int main(void)
 		}
 		else if (menu == 2)//Menu
 		{
+			al_stop_sample_instance(SoundIstance);
 			if ((event.type == ALLEGRO_EVENT_TIMER))
 			{
 				redraw = true;
@@ -248,6 +270,7 @@ int main(void)
 		
 		else if (menu==3) // RAnking
 		{ 
+			al_stop_sample_instance(SoundIstance);
 			if ((event.type == ALLEGRO_EVENT_TIMER))
 			{
 				redraw = true;

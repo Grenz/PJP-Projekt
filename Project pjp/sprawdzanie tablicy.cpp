@@ -1,5 +1,5 @@
 #include "Header.h"
-void sprawdzanie_tablicy(kamienie kamienietab[8][8],int *score,bool* sprawdzanieplanszy)
+void sprawdzanie_tablicy(kamienie kamienietab[8][8],int *score,bool* sprawdzanieplanszy,bool* przesuwanie)
 {
 	kamienie kamienietab2[8][8];
 	int k, b;
@@ -48,25 +48,6 @@ void sprawdzanie_tablicy(kamienie kamienietab[8][8],int *score,bool* sprawdzanie
 				*score = *score + 10;
 		}
 		}
-	bool powtorzenie = false;
 	*sprawdzanieplanszy = false;
-start:
-	powtorzenie = false;
-	for (int i = 0; i < 8; i++)
-		for (int j = 0; j < 8; j++)
-		{
-		if (kamienietab[i][j].wartosc == 4 && j == 0)
-		{
-			kamienietab[i][j].wartosc = rand() % 4;
-			*sprawdzanieplanszy = true;
-		}
-		else if (kamienietab[i][j].wartosc == 4 && j>0)
-		{
-			kamienietab[i][j].wartosc = kamienietab[i][j - 1].wartosc;
-			kamienietab[i][j - 1].wartosc = 4;
-			powtorzenie = true;
-		}
-		}
-	if (powtorzenie == true)
-		goto start;
+	*przesuwanie = true;
 }
